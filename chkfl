@@ -1,0 +1,8 @@
+if [ `grep "$2" $1  | wc -l` -gt 0 ]
+then
+  echo "true"
+  check_out=true
+else
+  echo "false"
+  check_out=false
+fi
