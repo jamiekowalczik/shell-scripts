@@ -12,7 +12,7 @@ REMDIR=upload
 export SSHUSER=${SSHUSERNAME}
 export SSHPASS=${SSHPASSWORD}
 
-function sftpfile {
+function sftp-put-file {
    if [ ! -z ${REMDIR} ]; then
       CDDIR="cd ${REMDIR}"
    fi
@@ -28,7 +28,7 @@ bye
 !
 }
 
-function chkfile {
+function sftp-check-file {
    if [ ! -z ${REMDIR} ]; then
       CDDIR="cd ${REMDIR}"
    fi
@@ -45,8 +45,12 @@ bye
 !
 }
 
-function does-file-exist {
-   SFTPOUTPUT=`chkfile "${1}" 2>&1`
+function sftp-get-file {
+   echo "Just a stub"
+}
+
+function sftp-does-file-exist {
+   SFTPOUTPUT=`sftp-check-file "${1}" 2>&1`
    EXISTS=`echo ${SFTPOUTPUT} | grep "Can't ls:" | grep "not found" | wc -l`
    ## If EXISTS equals 1 then the file does not exist return 0
    if [ ${EXISTS} == 1 ]; then
@@ -58,5 +62,5 @@ function does-file-exist {
 #################
 #################
 
-sftpfile test.txt >/dev/null 2>&1
-does-file-exist test.txt
+sftp-put-file test.txt >/dev/null 2>&1
+sftp-does-file-exist test.txt
