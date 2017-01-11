@@ -1,0 +1,50 @@
+#!/bin/bash
+
+SSHUSERNAME=user
+SSHPASSWORD=userspassword
+REMOTE_HOST=remotehostname.oripaddress
+REMDIR=upload
+
+###############
+###############
+export SSHUSER=${SSHUSERNAME}
+export SSHPASS=${SSHPASSWORD}
+
+function sftpfile {
+   if [ ! -z ${REMDIR} ]; then
+      CDDIR="cd ${REMDIR}"
+   fi
+   sshpass -e sftp -oBatchMode=no -b - ${SSHUSER}@${REMOTE_HOST} << !
+${CDDIR}
+put "${1}"
+bye
+!
+}
+
+function chkfile {
+   if [ ! -z ${REMDIR} ]; then
+      CDDIR="cd ${REMDIR}"
+   fi
+   REMFILE=`basename "${1}"`
+   sshpass -e sftp -oBatchMode=no -b - ${SSHUSER}@${REMOTE_HOST} << !
+${CDDIR}
+ls ${REMFILE}
+bye
+!
+}
+
+function does-file-exist {
+   SFTPOUTPUT=`chkfile "${1}" 2>&1`
+   EXISTS=`echo ${SFTPOUTPUT} | grep "Can't ls:" | grep "not found" | wc -l`
+   ## If EXISTS equals 1 then the file does not exist return 0
+   if [ ${EXISTS} == 1 ]; then
+      echo "0"
+   else
+      echo "1"
+   fi
+}
+#################
+#################
+
+sftpfile test.txt >/dev/null 2>&1
+does-file-exist test.txt
