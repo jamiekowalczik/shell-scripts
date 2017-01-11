@@ -1,9 +1,11 @@
 #!/bin/bash
 
-SSHUSERNAME=user
-SSHPASSWORD=userspassword
-REMOTE_HOST=remotehostname.oripaddress
+SSHUSERNAME=username
+SSHPASSWORD=UsersPassword
+REMOTE_HOST=localhost
 REMDIR=upload
+## Optional
+#IDENTITYFILE=/home/user/.ssh/id_rsa
 
 ###############
 ###############
@@ -14,7 +16,12 @@ function sftpfile {
    if [ ! -z ${REMDIR} ]; then
       CDDIR="cd ${REMDIR}"
    fi
-   sshpass -e sftp -oBatchMode=no -b - ${SSHUSER}@${REMOTE_HOST} << !
+   if [ ! -z ${IDENTITYFILE} ]; then
+      SFTPCMD="sftp -oIdentityFile=\"${IDENTITYFILE}\""
+   else
+      SFTPCMD="sshpass -e sftp"
+   fi
+   $SFTPCMD -oBatchMode=no -b - ${SSHUSER}@${REMOTE_HOST} << !
 ${CDDIR}
 put "${1}"
 bye
@@ -26,7 +33,12 @@ function chkfile {
       CDDIR="cd ${REMDIR}"
    fi
    REMFILE=`basename "${1}"`
-   sshpass -e sftp -oBatchMode=no -b - ${SSHUSER}@${REMOTE_HOST} << !
+   if [ ! -z ${IDENTITYFILE} ]; then
+      SFTPCMD="sftp -oIdentityFile=\"${IDENTITYFILE}\""
+   else
+      SFTPCMD="sshpass -e sftp"
+   fi
+   $SFTPCMD -oBatchMode=no -b - ${SSHUSER}@${REMOTE_HOST} << !
 ${CDDIR}
 ls ${REMFILE}
 bye
